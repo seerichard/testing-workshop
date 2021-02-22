@@ -1,7 +1,7 @@
 // dealing with react's simulated events
 import React from 'react'
 import {generate} from 'til-client-test-utils'
-import {render, Simulate} from 'react-testing-library'
+import {renderIntoDocument, cleanup} from 'react-testing-library'
 import Login from '../login'
 
 // Due to the fact that our element is not in the document, the
@@ -22,28 +22,32 @@ import Login from '../login'
 // Extra bonus, rather than manually inserting the container into the document
 // check out the docs for react-testing-library and the renderIntoDocument method!
 
+// This will remove everything from the DOM, including the container that the
+// component is mounted to
+afterEach(cleanup);
+
 test('calls onSubmit with the username and password when submitted', () => {
   // Arrange
   const fakeUser = generate.loginForm()
   const handleSubmit = jest.fn()
-  const {container, getByLabelText, getByText} = render(
+  const {getByLabelText, getByText} = renderIntoDocument(
     <Login onSubmit={handleSubmit} />,
   )
 
   const usernameNode = getByLabelText('username')
   const passwordNode = getByLabelText('password')
-  const formNode = container.querySelector('form')
   const submitButtonNode = getByText('submit')
 
   // Act
   usernameNode.value = fakeUser.username
   passwordNode.value = fakeUser.password
-  Simulate.submit(formNode)
+  // Simulate.submit(formNode)
+  submitButtonNode.click();
 
   // Assert
   expect(handleSubmit).toHaveBeenCalledTimes(1)
   expect(handleSubmit).toHaveBeenCalledWith(fakeUser)
-  expect(submitButtonNode.type).toBe('submit')
+  // expect(submitButtonNode.type).toBe('submit') // No need anymore as button has actually been clicked
 })
 
 //////// Elaboration & Feedback /////////
