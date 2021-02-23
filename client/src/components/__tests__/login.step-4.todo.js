@@ -1,7 +1,7 @@
 // snapshot testing
 import React from 'react'
 import {generate} from 'til-client-test-utils'
-import {renderIntoDocument, cleanup} from 'react-testing-library'
+import {renderIntoDocument, cleanup, render} from 'react-testing-library'
 import Login from '../login'
 
 afterEach(cleanup)
@@ -29,7 +29,12 @@ test('calls onSubmit with the username and password when submitted', () => {
 
 test('snapshot', () => {
   // render the login, this will give you back an object with a `container` property
+  const { container } = render(<Login />);
+
   // expect the `container` property to match a snapshot
+  // Take the firstChild because the container will always be a div - do no need to get
+  // If rendering a Fragment, it would take the firstChild - be wary
+  expect(container.firstChild).toMatchSnapshot();
 })
 
 //////// Elaboration & Feedback /////////
